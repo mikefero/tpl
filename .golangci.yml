@@ -44,6 +44,15 @@ linters:
     - depguard
     - gomnd
     - structcheck
+issues:
+  exclude-rules:
+    - linters:
+        - goheader
+      path: _test\.go
+    - linters:
+        - revive
+      name: dot-imports
+      path: _test\.go
 linters-settings:
   goheader:
     values:

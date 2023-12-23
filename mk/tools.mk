@@ -3,6 +3,7 @@
 # --------------------------------------------------
 
 COBRA_CLI_VERSION ?= v1.3.0
+GINKGO_VERSION ?= v2.13.2
 GOLANGCI_LINT_VERSION ?= v1.55.2
 
 # Ensure curl is available
@@ -13,6 +14,7 @@ endif
 .PHONY: install-tools
 install-tools:
 	@GOBIN="$(APP_DIR)/bin" go install github.com/spf13/cobra-cli@$(COBRA_CLI_VERSION)
+	@GOBIN="$(APP_DIR)/bin" go install github.com/onsi/ginkgo/v2/ginkgo@$(GINKGO_VERSION)
 	@curl -sSfL \
 		"https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh" \
 		| sh -s -- -b "$(APP_DIR)/bin" "$(GOLANGCI_LINT_VERSION)"

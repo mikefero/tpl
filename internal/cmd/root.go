@@ -19,7 +19,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var license string
@@ -40,13 +39,4 @@ func Execute(opts Options) {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-}
-
-func init() {
-	cobra.OnInitialize(initConfig)
-}
-
-func initConfig() {
-	viper.SetEnvPrefix("TPL")
-	viper.AutomaticEnv()
 }
