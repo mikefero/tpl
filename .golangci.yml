@@ -47,12 +47,19 @@ linters:
 issues:
   exclude-rules:
     - linters:
+        - forbidigo
+      path: internal/app/migrate.go
+    - linters:
         - goheader
       path: _test\.go
     - linters:
         - revive
       name: dot-imports
       path: _test\.go
+    - linters:
+        - revive
+      name: blank-imports
+      path: internal/app/migrate.go
 linters-settings:
   goheader:
     values:

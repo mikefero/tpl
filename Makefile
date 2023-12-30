@@ -10,6 +10,7 @@ APP_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 APP_WORKDIR := $(shell pwd)
 
 include mk/build.mk
+include mk/docker.mk
 include mk/run.mk
 include mk/test.mk
 include mk/tools.mk

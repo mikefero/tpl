@@ -24,6 +24,7 @@ import (
 
 type Config struct {
 	Database Database `yaml:"database" mapstructure:"database"`
+	Logger   Logger   `yaml:"logger" mapstructure:"logger"`
 }
 
 type Database struct {
@@ -34,6 +35,12 @@ type Database struct {
 	DBName   string `yaml:"dbname" mapstructure:"dbname"`
 }
 
+type Logger struct {
+	Level     string `yaml:"level" mapstructure:"level"`
+	Filename  string `yaml:"filename" mapstructure:"filename"`
+	Retention int    `yaml:"retention" mapstructure:"retention"`
+}
+
 func NewConfig() (*Config, error) {
 	// Database defaults
 	viper.SetDefault("database.host", "localhost")
@@ -41,6 +48,11 @@ func NewConfig() (*Config, error) {
 	viper.SetDefault("database.username", "tpl")
 	viper.SetDefault("database.password", "tpl")
 	viper.SetDefault("database.dbname", "tpl")
+
+	// Logger defaults
+	viper.SetDefault("logger.level", "info")
+	viper.SetDefault("logger.filename", "tpl-log.json")
+	viper.SetDefault("logger.retention", 60)
 
 	// TPL configuration setup for viper
 	viper.SetConfigName("tpl")
@@ -56,4 +68,14 @@ func NewConfig() (*Config, error) {
 		return nil, fmt.Errorf("error unmarshaling config: %w", err)
 	}
 	return &config, nil
+}
+
+func (c *Config) DataSourceName() string {
+	// TODO(fero): Enable TLS
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		c.Database.Username,
+		c.Database.Password,
+		c.Database.Host,
+		c.Database.Port,
+		c.Database.DBName)
 }

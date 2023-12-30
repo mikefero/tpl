@@ -4,3 +4,7 @@ database:
   username: tpl
   password: tpl
   dbname: tpl
+logger:
+  level: info
+  filename: tpl-log.json
+  retention: 60

@@ -27,6 +27,11 @@ var _ = Describe("Config", func() {
 					Password: "tpl",
 					DBName:   "tpl",
 				},
+				Logger: Logger{
+					Level:     "info",
+					Filename:  "tpl-log.json",
+					Retention: 60,
+				},
 			}))
 		})
 
@@ -37,6 +42,9 @@ var _ = Describe("Config", func() {
 			t.Setenv("TPL_DATABASE_USERNAME", "pink")
 			t.Setenv("TPL_DATABASE_PASSWORD", "purple")
 			t.Setenv("TPL_DATABASE_DBNAME", "yellow")
+			t.Setenv("TPL_LOGGER_LEVEL", "debug")
+			t.Setenv("TPL_LOGGER_FILENAME", "brown-log.json")
+			t.Setenv("TPL_LOGGER_RETENTION", "1")
 			config, err := NewConfig()
 			Expect(err).To(BeNil())
 			Expect(config).To(Equal(&Config{
@@ -46,6 +54,11 @@ var _ = Describe("Config", func() {
 					Username: "pink",
 					Password: "purple",
 					DBName:   "yellow",
+				},
+				Logger: Logger{
+					Level:     "debug",
+					Filename:  "brown-log.json",
+					Retention: 1,
 				},
 			}))
 		})
@@ -59,6 +72,11 @@ var _ = Describe("Config", func() {
 					Username: "kinp",
 					Password: "elprup",
 					DBName:   "wolley",
+				},
+				Logger: Logger{
+					Level:     "debug",
+					Filename:  "gol-nworb.nosj",
+					Retention: 2,
 				},
 			}
 			yData, err := yaml.Marshal(expected)
@@ -97,6 +115,11 @@ var _ = Describe("Config", func() {
 					Password: "purple",
 					DBName:   "yellow",
 				},
+				Logger: Logger{
+					Level:     "info",
+					Filename:  "tpl-log.json",
+					Retention: 60,
+				},
 			}))
 		})
 
@@ -106,6 +129,23 @@ var _ = Describe("Config", func() {
 			config, err := NewConfig()
 			Expect(err).To(Not(BeNil()))
 			Expect(config).To(BeNil())
+		})
+
+		It("DSN can be generated from default configuration values", func() {
+			config, err := NewConfig()
+			Expect(err).To(BeNil())
+			Expect(config.DataSourceName()).To(Equal("postgres://tpl:tpl@localhost:5432/tpl?sslmode=disable"))
+		})
+
+		It("DSN can be generated from overridden configuration values", func() {
+			t := GinkgoT()
+			t.Setenv("TPL_DATABASE_PORT", "1234")
+			t.Setenv("TPL_DATABASE_USERNAME", "pink")
+			t.Setenv("TPL_DATABASE_PASSWORD", "purple")
+			t.Setenv("TPL_DATABASE_DBNAME", "yellow")
+			config, err := NewConfig()
+			Expect(err).To(BeNil())
+			Expect(config.DataSourceName()).To(Equal("postgres://pink:purple@localhost:1234/yellow?sslmode=disable"))
 		})
 	})
 })

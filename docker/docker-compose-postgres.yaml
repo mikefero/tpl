@@ -1,0 +1,12 @@
+version: '3'
+services:
+  db:
+    image: postgres:16
+    container_name: tpl-postgres
+    environment:
+      POSTGRES_DB: tpl
+      POSTGRES_USER: tpl
+      POSTGRES_PASSWORD: tpl
+    ports:
+      - "5432:5432"
+    restart: always
