@@ -2,6 +2,11 @@
 # Build tooling
 # --------------------------------------------------
 
+# Ensure docker is available
+ifeq (, $(shell which docker 2> /dev/null))
+$(error "'docker' is not installed or available in PATH")
+endif
+
 # Ensure git is available
 ifeq (, $(shell which git 2> /dev/null))
 $(error "'git' is not installed or available in PATH")
@@ -26,3 +31,12 @@ endef
 build:
 	@CGO_ENABLED=0 go build -ldflags "$(APP_LDFLAGS)" \
 		-o "$(APP_DIR)/bin/$(APP_NAME)" "$(APP_DIR)/main.go"
+
+.PHONY: build-docs
+build-docs: lint-oas
+	@docker run --rm -it \
+		-v $(APP_DIR)/openapi.yaml:/spec/openapi.yaml \
+		-v $(APP_DIR)/docs:/docs \
+		redocly/cli build-docs \
+			/spec/openapi.yaml \
+			--output=/docs/openapi.html

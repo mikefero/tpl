@@ -1,0 +1,269 @@
+openapi: 3.0.0
+info:
+  title: The Pinball League Server
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.0
+paths:
+  /players:
+    get:
+      summary: Get a paginated list of players.
+      operationId: list-players
+      parameters:
+        - $ref: '#/components/parameters/PageToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/ListPlayers'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/Internal'
+    post:
+      summary: Create a new player
+      operationId: create-player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+      responses:
+        '201':
+          $ref: '#/components/responses/GetPlayer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/Internal'
+  /players/{id}:
+    get:
+      summary: Get a player by ID.
+      operationId: get-player
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPlayer'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/Internal'
+    put:
+      summary: Update a player by ID.
+      operationId: update-player
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPlayer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/Internal'
+    patch:
+      summary: Partially update a player by ID.
+      operationId: patch-player
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPlayer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/Internal'
+    delete:
+      summary: Delete a player by ID.
+      operationId: delete-player
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Player deleted successfully.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/Internal'
+components:
+  schemas:
+    Player:
+      description: The representation of a player schema.
+      type: object
+      example:
+        id: b90cfbca-5e88-48d8-ae5a-e61b10eb6018
+        first_name: Papa
+        last_name: November
+        initials: PIN
+        email: papaindianovember@gmail.com
+        password: funhouse
+        created_at: 727851600
+        updated_at: 770616000
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+      properties:
+        id:
+          description: Unique identifier for referencing a player.
+          type: string
+          format: uuid
+          readOnly: true
+          example: b90cfbca-5e88-48d8-ae5a-e61b10eb6018
+        first_name:
+          description: First name of the player.
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: '^[A-Z][a-z]+$'
+          example: Papa
+        last_name:
+          description: Last name of the player.
+          type: string
+          minLength: 1
+          maxLength: 255
+          pattern: '^[A-Z][a-z]+$'
+          example: November
+        initials:
+          description: Initials of the player; will be converted to UPPERCASE.
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z][a-z]+$'
+          example: PIN
+        email:
+          description: E-Mail of the player; used for authentication.
+          type: string
+          format: email
+          minLength: 6
+          maxLength: 255
+          example: papaindianovember@gmail.com
+        password:
+          description: Password of the player; used for authentication.
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 32
+          example: funhouse
+        created_at:
+          description: Unix epoch when the player was created.
+          type: integer
+          format: int64
+          readOnly: true
+          example: 727851600
+        updated_at:
+          description: Unix epoch when the player was updated.
+          type: integer
+          format: int64
+          readOnly: true
+          example: 770616000
+    NextPageToken:
+      type: string
+      description: A token that can be used with `page_token` parameter to retrieve the next page; if missing, there are no subsequent pages.
+      readOnly: true
+      example: VGhlIFBpbmJhbGwgTGVhZ3VlIFNlcnZlcgo=
+    Error:
+      type: object
+      properties:
+        status:
+          description: HTTP status code.
+          type: integer
+          format: int32
+          example: 404
+        message:
+          description: Detailed message describing the error which occurred.
+          type: string
+          example: The requested resource was not found.
+  parameters:
+    PageToken:
+      name: page_token
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Token to retrieve the next page of items in a response.
+  responses:
+    ListPlayers:
+      description: A paginated list of players.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+              next_page_token:
+                $ref: '#/components/schemas/NextPageToken'
+    GetPlayer:
+      description: A single player.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              items:
+                $ref: '#/components/schemas/Player'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Internal:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
